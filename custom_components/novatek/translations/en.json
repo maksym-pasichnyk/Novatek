@@ -1,0 +1,94 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Add Novatek device",
+        "description": "Enter the IP address and password of your Novatek power meter.",
+        "data": {
+          "host": "IP address",
+          "password": "Password"
+        }
+      },
+      "discovery_confirm": {
+        "title": "Add discovered Novatek device",
+        "description": "Found device {hostname}. Enter its password to add it.",
+        "data": {
+          "password": "Password"
+        }
+      },
+      "reconfigure": {
+        "title": "Reconfigure Novatek device",
+        "description": "Enter a new password for your Novatek device.",
+        "data": {
+          "password": "Password"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Failed to connect to the selected device. Check network reachability.",
+      "invalid_auth": "Invalid password (or this is not a supported Novatek device)."
+    },
+    "abort": {
+      "already_configured": "This device is already configured.",
+      "reconfigure_successful": "Device settings have been updated and the integration reloaded."
+    }
+  },
+  "entity": {
+    "switch": {
+      "relay": { "name": "Load relay" }
+    },
+    "button": {
+      "reset_energy": { "name": "Reset energy counters" },
+      "reboot":       { "name": "Reboot device" }
+    },
+    "sensor": {
+      "voltage":        { "name": "Voltage" },
+      "current":        { "name": "Current" },
+      "frequency":      { "name": "Frequency" },
+      "active_power":   { "name": "Active power" },
+      "apparent_power": { "name": "Apparent power" },
+      "energy_total":   { "name": "Active energy" },
+      "apparent_energy":{ "name": "Apparent energy" },
+      "energy_daily":   { "name": "Active energy today" },
+      "energy_weekly":  { "name": "Active energy this week" },
+      "energy_monthly": { "name": "Active energy this month" },
+      "temperature":    { "name": "Temperature" },
+      "ar_time":        { "name": "Auto-reconnect countdown" }
+    },
+    "binary_sensor": {
+      "relay_on":              { "name": "Load relay" },
+      "apv_voltage":           { "name": "APV voltage countdown" },
+      "apv_current":           { "name": "APV current countdown" },
+      "apv_power":             { "name": "APV power countdown" },
+      "apv_frequency":         { "name": "APV frequency countdown" },
+      "manual_control":        { "name": "Manual control" },
+      "event_control":         { "name": "Schedule control" },
+      "vacation_lock":         { "name": "Vacation lock" },
+      "panel_locked":          { "name": "Front panel locked" },
+      "ntp_synced":            { "name": "NTP synchronised" },
+      "wifi_connected":        { "name": "Wi-Fi connected" },
+      "cloud_running":         { "name": "Cloud service" },
+      "ntp_running":           { "name": "NTP service" },
+      "overvoltage":           { "name": "Overvoltage" },
+      "undervoltage":          { "name": "Undervoltage" },
+      "voltage_290v":          { "name": "Voltage > 290 V" },
+      "voltage_apv_limit":     { "name": "Voltage APV limit exceeded" },
+      "overcurrent":           { "name": "Overcurrent" },
+      "current_17a":           { "name": "Current > 17 A" },
+      "current_apv_limit":     { "name": "Current APV limit exceeded" },
+      "overpower":             { "name": "Overpower" },
+      "power_apv_limit":       { "name": "Power APV limit exceeded" },
+      "temp_sensor_fault":     { "name": "Temperature sensor fault" },
+      "temp_sensor_open":      { "name": "Temperature sensor open circuit" },
+      "temp_sensor_short":     { "name": "Temperature sensor short circuit" },
+      "rtc_fault":             { "name": "RTC clock failure" },
+      "relay_fault":           { "name": "Relay fault" },
+      "time_limit_blocked":    { "name": "Operating time limit" },
+      "overfrequency":         { "name": "Overfrequency" },
+      "underfrequency":        { "name": "Underfrequency" },
+      "frequency_apv_limit":   { "name": "Frequency APV limit exceeded" },
+      "not_calibrated":        { "name": "Device not calibrated" },
+      "settings_damaged":      { "name": "Settings corrupted" }
+    }
+  }
+}

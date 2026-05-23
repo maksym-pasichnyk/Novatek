@@ -1,0 +1,94 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Додати пристрій Novatek",
+        "description": "Введіть IP-адресу та пароль вашого лічильника Novatek.",
+        "data": {
+          "host": "IP-адреса",
+          "password": "Пароль"
+        }
+      },
+      "discovery_confirm": {
+        "title": "Додати знайдений пристрій Novatek",
+        "description": "Знайдено пристрій {hostname}. Введіть пароль для підключення.",
+        "data": {
+          "password": "Пароль"
+        }
+      },
+      "reconfigure": {
+        "title": "Переналаштування пристрою Novatek",
+        "description": "Введіть новий пароль для вашого пристрою Novatek.",
+        "data": {
+          "password": "Пароль"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Не вдалося підʼєднатися до вибраного пристрою. Перевірте його доступність у мережі.",
+      "invalid_auth": "Невірний пароль (або це не підтримуваний пристрій Novatek)."
+    },
+    "abort": {
+      "already_configured": "Цей пристрій уже додано.",
+      "reconfigure_successful": "Налаштування пристрою оновлено, інтеграцію перезавантажено."
+    }
+  },
+  "entity": {
+    "switch": {
+      "relay": { "name": "Реле навантаження" }
+    },
+    "button": {
+      "reset_energy": { "name": "Скинути лічильники енергії" },
+      "reboot":       { "name": "Перезавантажити пристрій" }
+    },
+    "sensor": {
+      "voltage":        { "name": "Напруга" },
+      "current":        { "name": "Струм" },
+      "frequency":      { "name": "Частота" },
+      "active_power":   { "name": "Активна потужність" },
+      "apparent_power": { "name": "Повна потужність" },
+      "energy_total":   { "name": "Активна енергія" },
+      "apparent_energy":{ "name": "Повна енергія" },
+      "energy_daily":   { "name": "Активна енергія за добу" },
+      "energy_weekly":  { "name": "Активна енергія за тиждень" },
+      "energy_monthly": { "name": "Активна енергія за місяць" },
+      "temperature":    { "name": "Температура" },
+      "ar_time":        { "name": "Час до повторного ввімкнення" }
+    },
+    "binary_sensor": {
+      "relay_on":              { "name": "Реле навантаження" },
+      "apv_voltage":           { "name": "АПВ по напрузі (відлік)" },
+      "apv_current":           { "name": "АПВ по струму (відлік)" },
+      "apv_power":             { "name": "АПВ по потужності (відлік)" },
+      "apv_frequency":         { "name": "АПВ по частоті (відлік)" },
+      "manual_control":        { "name": "Ручне керування" },
+      "event_control":         { "name": "Керування за розкладом" },
+      "vacation_lock":         { "name": "Блокування відпусткою" },
+      "panel_locked":          { "name": "Лицьова панель заблокована" },
+      "ntp_synced":            { "name": "Синхронізація NTP" },
+      "wifi_connected":        { "name": "Wi-Fi підключений" },
+      "cloud_running":         { "name": "Хмарна служба" },
+      "ntp_running":           { "name": "Служба NTP" },
+      "overvoltage":           { "name": "Перевищення напруги" },
+      "undervoltage":          { "name": "Зниження напруги" },
+      "voltage_290v":          { "name": "Напруга понад 290 В" },
+      "voltage_apv_limit":     { "name": "Ліміт АПВ по напрузі вичерпано" },
+      "overcurrent":           { "name": "Перевищення струму" },
+      "current_17a":           { "name": "Струм понад 17 А" },
+      "current_apv_limit":     { "name": "Ліміт АПВ по струму вичерпано" },
+      "overpower":             { "name": "Перевищення потужності" },
+      "power_apv_limit":       { "name": "Ліміт АПВ по потужності вичерпано" },
+      "temp_sensor_fault":     { "name": "Несправність датчика температури" },
+      "temp_sensor_open":      { "name": "Обрив датчика температури" },
+      "temp_sensor_short":     { "name": "Замикання датчика температури" },
+      "rtc_fault":             { "name": "Збій годинника (RTC)" },
+      "relay_fault":           { "name": "Несправність реле" },
+      "time_limit_blocked":    { "name": "Блокування за часом роботи" },
+      "overfrequency":         { "name": "Перевищення частоти" },
+      "underfrequency":        { "name": "Зниження частоти" },
+      "frequency_apv_limit":   { "name": "Ліміт АПВ по частоті вичерпано" },
+      "not_calibrated":        { "name": "Пристрій не відкалібровано" },
+      "settings_damaged":      { "name": "Пошкодження налаштувань" }
+    }
+  }
+}
