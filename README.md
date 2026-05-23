@@ -1,6 +1,6 @@
 # Novatek
 
-Effortlessly connect, discover, and monitor your Novatek-Electro Wi-Fi power meter or voltage relay in Home Assistant with this fully local LAN integration. It talks directly to supported EM-125, EM-125S, EM-126T, EM-126TS, and EM-129 devices over the documented HTTP API, exposes native Home Assistant sensor entities, and keeps everyday polling on your network instead of in a vendor cloud.
+Effortlessly connect, discover, and monitor your Novatek-Electro Wi-Fi power meter or voltage relay in Home Assistant with this fully local LAN integration. It talks directly to supported EM-125, EM-125S, EM-126T, EM-126TS, and EM-129 devices over the documented HTTP API and keeps everyday polling on your network instead of in a vendor cloud.
 
 ## Features
 
@@ -9,7 +9,9 @@ Effortlessly connect, discover, and monitor your Novatek-Electro Wi-Fi power met
 - **UI-based setup:** Config-flow based, with no YAML required.
 - **Broad device support:** Recognizes EM-125, EM-125S, EM-126T, EM-126TS, and EM-129 models.
 - **Energy dashboard ready:** Exposes active energy as a `total_increasing` energy sensor suitable for Home Assistant Energy.
-- **Rich electrical telemetry:** Track voltage, current, frequency, active power, apparent power, active energy, and apparent energy.
+- **Rich electrical telemetry:** Voltage, current, frequency, active/apparent power, active energy (total, daily, weekly, monthly), apparent energy.
+- **Relay control:** Turn the load relay on/off directly from Home Assistant.
+- **Device status and fault monitoring:** Dedicated binary sensors for APV countdowns, WiFi/NTP/cloud connectivity, and all hardware fault flags.
 - **Flexible installation:** Install through HACS or manually under `custom_components/novatek`.
 
 ## Requirements
@@ -35,9 +37,16 @@ Effortlessly connect, discover, and monitor your Novatek-Electro Wi-Fi power met
 
 ## Setup
 
-1. Make sure the device is on the same LAN as Home Assistant and advertises a supported DHCP hostname.
-2. Wait for Home Assistant to detect the device automatically in **Settings -> Devices & services**.
-3. Open the discovered **Novatek** device and enter its password.
+### DHCP discovery (automatic)
+
+1. Make sure the device is on the same LAN as Home Assistant.
+2. Home Assistant will detect the device automatically in **Settings -> Devices & services**.
+3. Open the discovered **Novatek** entry and enter the device password.
+
+### Manual setup
+
+1. Go to **Settings -> Devices & services -> Add integration** and search for **Novatek**.
+2. Enter the device IP address and password.
 
 ## Authentication
 
@@ -45,30 +54,62 @@ The device uses a local SHA-1 challenge-response login flow.
 
 - The integration first reads the model identifier and a per-session salt from the device.
 - It then computes `SHA1(<model_name> + <password> + <salt>)` and exchanges that for a session ID.
-- All subsequent reads are performed locally against the authenticated session.
+- All subsequent requests are performed locally against the authenticated session.
 
-After setup, day-to-day polling stays local over your LAN.
+After setup, day-to-day polling stays entirely local over your LAN.
 
 ## Entities
 
-- **Sensors:** Voltage, Current, Frequency, Active power, Apparent power, Active energy, Apparent energy
-- **Disabled by default:** Apparent energy
+### Sensors
 
-## Services
+| Entity | Unit | Notes |
+|---|---|---|
+| Voltage | V | |
+| Current | A | |
+| Frequency | Hz | |
+| Active power | W | |
+| Apparent power | VA | |
+| Active energy | Wh → kWh | Total accumulated |
+| Active energy today | Wh → kWh | Resets at midnight on device |
+| Active energy this week | Wh → kWh | |
+| Active energy this month | Wh → kWh | |
+| Apparent energy | VAh | |
+| Auto-reconnect countdown | s | Diagnostic — seconds until APV reconnect |
+| Temperature | °C | EM-126T / EM-126TS only |
 
-This integration does not currently expose custom Home Assistant services.
+### Switch
+
+| Entity | Notes |
+|---|---|
+| Load relay | Turns the load on or off |
+
+### Buttons
+
+| Entity | Category | Notes |
+|---|---|---|
+| Reset energy counters | Config | Resets all energy totals on the device |
+| Reboot device | Config | Reboots the device firmware |
+
+### Binary sensors (diagnostic)
+
+**Device state** (`sys_flag`): load relay state, APV voltage/current/power/frequency countdowns, manual control, schedule control, vacation lock, front panel lock, NTP sync, Wi-Fi connected, cloud service, NTP service.
+
+**Faults** (`faul_flag`): overvoltage, undervoltage, voltage > 290 V, overcurrent, current > 17 A, overpower, overfrequency, underfrequency, temperature sensor fault/open/short, relay fault, RTC fault, operating time limit, APV reconnect limits, not calibrated, settings corrupted.
 
 ## Caveats
 
-- The device only allows one active web/API session at a time. Opening the device's own web UI will invalidate Home Assistant's session, and vice versa. The current update will fail and the next scheduled poll will authenticate again.
+- The device only allows one active web/API session at a time. Opening the device's own web UI will invalidate Home Assistant's session, and vice versa. The current update will fail and the next scheduled poll will re-authenticate automatically.
 - DHCP discovery matches hostnames advertising as `em-129*`, `em-126*`, `em-125*`, and `novatek*`.
-- Some firmwares may lose their default gateway after DHCP lease renewal, which can make the device unreachable from other subnets. Keeping Home Assistant on the same LAN or using a stable network configuration is safer.
+- Some firmwares may lose their default gateway after DHCP lease renewal, which can make the device unreachable from other subnets. Keeping Home Assistant on the same LAN or using a static IP is safer.
 - The polling interval is fixed at `5` seconds.
+- Resetting energy counters via the **Reset energy counters** button will cause all energy sensors to drop to zero. Home Assistant's long-term statistics recorder handles this automatically.
 
 ## Supported Devices
 
-- **EM-125**
-- **EM-125S**
-- **EM-126T**
-- **EM-126TS**
-- **EM-129**
+| Model | Temperature sensor |
+|---|---|
+| EM-125 | No |
+| EM-125S | No |
+| EM-126T | Yes |
+| EM-126TS | Yes |
+| EM-129 | No |
