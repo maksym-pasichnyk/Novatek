@@ -9,7 +9,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
-from .api import NovatekAuthError, NovatekClient, NovatekConnectionError
+from .api import NovatekAuthError, NovatekClient, NovatekConnectionError, NovatekSessionExpiredError
 from .const import DEFAULT_SCAN_INTERVAL, DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
@@ -42,5 +42,5 @@ class NovatekCoordinator(DataUpdateCoordinator[dict[str, float | int]]):
             return await self.client.async_get_data()
         except NovatekAuthError as err:
             raise ConfigEntryAuthFailed(f"Authentication failed: {err}") from err
-        except NovatekConnectionError as err:
+        except (NovatekConnectionError, NovatekSessionExpiredError) as err:
             raise UpdateFailed(f"Error communicating with Novatek device: {err}") from err

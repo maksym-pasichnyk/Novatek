@@ -62,9 +62,6 @@ DEVICE_MODELS: dict[int, str] = {
 # Models that have a built-in temperature sensor (DS18B20)
 TEMPERATURE_MODELS: frozenset[str] = frozenset({"EM-126T", "EM-126TS"})
 
-# STATUS values that indicate an authentication failure (vs. a generic device error)
-_AUTH_STATUSES: frozenset[str] = frozenset({"ERROR_LOGIN", "ERROR_LOGOUT"})
-
 MEASUREMENTS: tuple[tuple[str, str, float], ...] = (
     ("volt_msr",    KEY_VOLTAGE,          10.0),
     ("cur_msr",     KEY_CURRENT,         100.0),
@@ -132,7 +129,11 @@ class NovatekConnectionError(Exception):
 
 
 class NovatekAuthError(Exception):
-    """Authentication failed (bad password or unsupported device)."""
+    """Authentication failed — bad password or unsupported device."""
+
+
+class NovatekSessionExpiredError(Exception):
+    """Session token expired — device requires re-authentication."""
 
 
 class NovatekClient:
@@ -174,6 +175,13 @@ class NovatekClient:
         return self._model in TEMPERATURE_MODELS
     
     async def async_get_data(self) -> dict[str, float | int]:
+        try:
+            return await self._fetch_data()
+        except NovatekSessionExpiredError:
+            await self.async_authenticate()
+            return await self._fetch_data()
+    
+    async def _fetch_data(self) -> dict[str, float | int]:
         data: dict[str, float | int] = {}
         for api_key, canonical_key, divisor in MEASUREMENTS:
             raw = await self._get_measurement(api_key)
@@ -226,7 +234,7 @@ class NovatekClient:
         """Terminate the session on the device."""
         try:
             await self._raw_get(f"/api/login?logout={self._sid}")
-        except (NovatekAuthError, NovatekConnectionError):
+        except (NovatekAuthError, NovatekSessionExpiredError, NovatekConnectionError):
             pass
 
     async def _get_measurement(self, key: str) -> int:
@@ -236,20 +244,19 @@ class NovatekClient:
     async def _raw_get(self, path: str) -> dict[str, object]:
         url = f"http://{self._host}{path}"
         try:
-            async with self._session.get(url, timeout=self._timeout) as resp:
-                if resp.status in (401, 403):
-                    raise NovatekAuthError(f"HTTP {resp.status} from {url}")
-                if resp.status >= 400:
-                    raise NovatekConnectionError(f"HTTP {resp.status} from {url}")
+            async with self._session.get(url, timeout=self._timeout, allow_redirects=False) as resp:
+                if resp.status == 302:
+                    raise NovatekSessionExpiredError("Session expired")
                 data = await resp.json(content_type=None)
-        except (ClientError, asyncio.TimeoutError) as err:
+        except (ClientError, asyncio.TimeoutError, ValueError, KeyError) as err:
             raise NovatekConnectionError(str(err)) from err
-        except ValueError as err:
-            raise NovatekConnectionError(f"Non-JSON response from {url}: {err}") from err
 
-        status = data["STATUS"]
-        if status == "OK":
-            return data
-        if status in _AUTH_STATUSES:
-            raise NovatekAuthError(f"Authentication error {status!r}: {data!r}")
-        raise NovatekConnectionError(f"Device returned {status!r}: {data!r}")
+        match data["STATUS"]:
+            case "OK":
+                return data
+            case "ERROR_LOGIN":
+                raise NovatekAuthError(f"Login failed: {data!r}")
+            case "ERROR_LOGOUT":
+                raise NovatekConnectionError(f"Logout failed: {data!r}")
+            case status:
+                raise NovatekConnectionError(f"Device returned {status!r}: {data!r}")

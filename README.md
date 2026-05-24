@@ -90,7 +90,7 @@ After setup, day-to-day polling stays entirely local over your LAN.
 | Reset energy counters | Config | Resets all energy totals on the device |
 | Reboot device | Config | Reboots the device firmware |
 
-### Binary sensors (diagnostic)
+### Binary sensors
 
 **Device state** (`sys_flag`): load relay state, APV voltage/current/power/frequency countdowns, manual control, schedule control, vacation lock, front panel lock, NTP sync, Wi-Fi connected, cloud service, NTP service.
 
@@ -100,7 +100,7 @@ After setup, day-to-day polling stays entirely local over your LAN.
 
 - The device only allows one active web/API session at a time. Opening the device's own web UI will invalidate Home Assistant's session, and vice versa. The current update will fail and the next scheduled poll will re-authenticate automatically.
 - DHCP discovery matches hostnames advertising as `em-129*`, `em-126*`, `em-125*`, and `novatek*`.
-- Some firmwares may lose their default gateway after DHCP lease renewal, which can make the device unreachable from other subnets. Keeping Home Assistant on the same LAN or using a static IP is safer.
+- For reliable connectivity, keep Home Assistant on the same LAN as the device or assign the device a static IP via DHCP reservation to avoid disruption during lease renewal.
 - The polling interval is fixed at `5` seconds.
 - Resetting energy counters via the **Reset energy counters** button will cause all energy sensors to drop to zero. Home Assistant's long-term statistics recorder handles this automatically.
 
